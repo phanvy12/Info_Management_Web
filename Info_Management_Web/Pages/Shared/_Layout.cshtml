@@ -1,0 +1,74 @@
+﻿@using Info_Management_Web.Models
+@using System.Text.Json
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Info_Management_Web.styles.css" asp-append-version="true" />
+</head>
+<body>
+    @{
+        var accJson = Context.Session.GetString("USER");
+        Account account = null;
+        if (!string.IsNullOrEmpty(accJson))
+        {
+            account = JsonSerializer.Deserialize<Account>(accJson);
+        }
+    }
+    <header class="header-nav" role="banner">
+        <div class="header-container">
+            <img src="~/images/logo.png" alt="Logo Khoa Công Nghệ Thông Tin" class="logo" width="50" height="50">
+            <h1 class="page-title"><a href="/Home" class="header-title-link">Trang chủ - Khoa Công Nghệ Thông Tin</a></h1>
+
+            <form class="search-form" role="search">
+                <div class="search-container">
+                    <label for="search" class="visually-hidden">Tìm kiếm</label>
+                    <input type="search" id="search" class="search-input" placeholder="Bạn cần tìm gì?..." aria-label="Search">
+                    <button type="submit" class="search-button">Tìm kiếm</button>
+                </div>
+            </form>
+
+            <div class="user-info" aria-label="Thông tin người dùng">
+                @if(account != null)
+                {
+                    <div class="user-id">@account.Username</div>
+                    <div class="user-name">@account.Fullname</div>
+                }
+            </div>
+        </div>
+    </header>
+
+    <nav class="main-nav" role="navigation" aria-label="Main navigation">
+        <ul class="nav-list">
+            <li><a href="#content" class="nav-item nav-content">Nội dung</a></li>
+            <li><a href="#news" class="nav-item nav-news">Tin tức - Sự kiện</a></li>
+            <li><a href="#docs" class="nav-item nav-docs">Tài liệu học tập</a></li>
+            <li><a href="#research" class="nav-item nav-research">Nghiên cứu khoa học</a></li>
+            @if(account != null)
+            {
+                if (account.Role == (int)UserRole.Admin || account.Role == (int)UserRole.Teacher)
+                {
+                    <li><a href="/Management/Index" class="nav-item nav-manage">Quản lý thông tin</a></li>
+                }
+            }
+            <li><a href="/Home?handler=Logout" class="nav-item" style="background-color:red; color:white">Đăng xuất</a></li>
+        </ul>
+    </nav>
+
+    <main id="main-content" role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-content">
+            <p class="copyright">© 2024 Khoa Công Nghệ Thông Tin.</p>
+            <p class="contact-info">Liên hệ: 0123 456 789 - Email: adminQLWK@gmail.com.vn</p>
+        </div>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

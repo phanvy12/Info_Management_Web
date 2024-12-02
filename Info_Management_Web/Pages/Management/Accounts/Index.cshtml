@@ -1,0 +1,231 @@
+﻿@page
+@model Info_Management_Web.Pages.Management.Accounts.IndexModel
+@{
+    Layout = "_Layout_Management";
+}
+<section class="user-management" role="main" aria-label="User Management">
+    <div class="management-container">
+        @if(TempData["ErrorMessage"] != null)
+        {
+            <div id="errorMessage" class="message error" role="alert">
+                <svg class="message-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-7v2h2v-2h-2zm0-8v6h2V7h-2z" />
+                </svg>
+                <div class="message-content">
+                    <div class="message-title">Xảy ra lỗi</div>
+                    <p>@TempData["ErrorMessage"].</p>
+                </div>
+                <button class="close-button" aria-label="Close">&times;</button>
+            </div>
+            <script>
+               window.onload = closeMessage('error');
+            </script>
+        }
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div id="successMessage" class="message success" role="alert">
+                <svg class="message-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1.177-7.86l-2.765-2.767L7 12.431l3.119 3.121a1 1 0 001.414 0l5.952-5.95-1.062-1.062-5.6 5.6z" />
+                </svg>
+                <div class="message-content">
+                    <div class="message-title">Success</div>
+                    <p>Great! Your changes have been successfully saved.</p>
+                </div>
+                <button class="close-button" aria-label="Close">&times;</button>
+            </div>
+            <script>
+                window.onload = closeMessage('success');
+            </script>
+        }
+        <div class="header-section">
+            <h1 class="page-title">Người dùng</h1>
+
+            <form method="get" class="search-container" role="search">
+                <img src="https://cdn.builder.io/api/v1/image/assets/TEMP/2b1d7802bce33a8e89faf78a62914b764a57288c13e0f15ccf53fab2517fbbfc?placeholderIfAbsent=true&apiKey=d4effe3ceacd4f4784b6120101111dc6"
+                     alt="Search"
+                     class="search-icon"
+                     loading="lazy" />
+                <label for="userSearch" class="visually-hidden">Search users</label>
+                <input type="hidden" name="pageNumber" value="@Model.PageIndex"/>
+                <input type="search"
+                       name="search"
+                       id="userSearch"
+                       class="search-input"
+                       placeholder="Tìm kiếm người dùng (Họ tên, tên tài khoản)..........."
+                       aria-label="Search users" />
+            </form>
+
+            <a href="#" class="action-button add" aria-label="Thêm người dùng" onclick="showPopup('createPopupOverlay')">
+                <img src="~/images/icons/add-icon.png" alt="" class="action-icon" aria-hidden="true" />
+                <span>Thêm người dùng</span>
+            </a>
+            <a href="/Management/Index" class="action-button add" aria-label="Trở lại">
+                <img src="~/images/icons/logout.png" alt="" class="action-icon" aria-hidden="true" />
+                <span>Trở lại</span>
+            </a>
+        </div>
+
+        <div class="divider" role="separator"></div>
+
+        <div class="table-scroll" role="table" aria-label="Danh sách người dùng">
+        <table class="user-table">
+            <thead>
+                <tr>
+                    <th>ID người dùng</th>
+                    <th>Tên người dùng</th>
+                    <th>Tên đăng nhập</th>
+                    <th>Mật khẩu</th>
+                    <th>Phân quyền</th>
+                    <th colspan="2">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                    @if(Model.Accounts != null && Model.Accounts.Count > 0)
+                    {
+                        foreach(var account in Model.Accounts)
+                        {
+                            <tr>
+                                <td>@account.Id</td>
+                                <td>@account.Fullname</td>
+                                <td>@account.Username</td>
+                                <td>@account.Password</td>
+                                <td>
+                                    @if (account.Role == (int)UserRole.Admin)
+                                    {
+                                        <text>Ban quản trị</text>
+                                    }
+                                    else if (account.Role == (int)UserRole.Teacher)
+                                    {
+                                        <text>Giáo viên</text>
+                                    }
+                                    else
+                                    {
+                                        <text>Học sinh</text>
+                                    }
+                                </td>
+                                <td class="actions-table-header">
+                                    <a asp-route-accountId="@account.Id" class="action-button edit" aria-label="Sửa thông tin">
+                                        <img src="~/images/icons/edit.png" alt="" class="action-icon" aria-hidden="true" />
+                                        <span>Sửa thông tin</span>
+                                    </a>
+
+                                    <a asp-route-id="@account.Id" asp-page-handler="Delete" class="action-button delete" aria-label="Xóa người dùng">
+                                        <img src="~/images/icons/delete.png" alt="" class="action-icon" aria-hidden="true" />
+                                        <span>Xóa người dùng</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+            </tbody>
+        </table>
+    </div>
+        <div class="paging">
+            <nav class="navigation-container" role="navigation" aria-label="Pagination Navigation">
+                <a class="navigation-controls" asp-route-pageNumber="@Model.PreviousPage">
+                    <img loading="lazy" src="~/images/icons/back-icon.png" class="control-image" alt="" />
+                    <span class="control-number" aria-hidden="true">@Model.PreviousPage</span>
+                </a>
+                <div class="action-text">Xem thêm</div>
+                <a class="navigation-controls" asp-route-pageNumber="@Model.NextPage">
+                    <span class="control-number" aria-hidden="true">@Model.NextPage</span>
+                    <img loading="lazy" src="~/images/icons/next-icon.png" class="control-image" alt="" />
+                </a>
+            </nav>
+        </div>
+</section>
+
+<form asp-page-handler="CreateNewAccount" method="post">
+    <div class="popup-overlay" id="createPopupOverlay">
+        <div class="popup-container">
+            <div class="popup-header">
+                <h2>Thêm người dùng</h2>
+                <button type="button" class="close-button" onclick="hidePopup('createPopupOverlay')">&times;</button>
+            </div>
+            <div id="userForm">
+                <div class="form-group">
+                    <label for="fullName">Tên người dùng</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="username">Tên đăng nhập</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Mật khẩu</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="role">Phân quyền</label>
+                    <div class="select-wrapper">
+                        <select class="styled-select" id="role" name="role">
+                            <option value="">Chọn phân quyền</option>
+                            <option value="@UserRole.Admin.ToString()">Ban quản trị</option>
+                            <option value="@UserRole.Teacher.ToString()">Giáo viên</option>
+                            <option value="@UserRole.Student.ToString()">Học sinh</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="submit-button">Thêm tài khoản</button>
+            </div>
+        </div>
+    </div>
+</form>
+@if(Model.EditAccount != null)
+{
+    <form asp-page-handler="EditAccount" method="post">
+        <div class="popup-overlay" id="editPopupOverlay">
+            <div class="popup-container">
+                <div class="popup-header">
+                    <h2>Cập nhật người dùng</h2>
+                    <button type="button" class="close-button" onclick="hidePopup('editPopupOverlay')">&times;</button>
+                </div>
+                <div id="userForm">
+                    <input type="hidden" name="id" value="@Model.EditAccount.Id"/>
+                    <div class="form-group">
+                        <label for="fullName">Tên người dùng</label>
+                        <input type="text" id="fullName" name="fullName" value="@Model.EditAccount.Fullname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Tên đăng nhập</label>
+                        <input type="text" id="username" name="username" value="@Model.EditAccount.Username" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mật khẩu</label>
+                        <input type="password" id="password" name="password" value="@Model.EditAccount.Password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Phân quyền</label>
+                        <div class="select-wrapper">
+                            <select class="styled-select" id="role" name="role">
+                                <option value="">Chọn phân quyền</option>
+                                @if(Model.EditAccount.Role == (int)UserRole.Admin)
+                                {
+                                    <option value="@UserRole.Admin.ToString()" selected>Ban quản trị</option>
+                                    <option value="@UserRole.Teacher.ToString()">Giáo viên</option>
+                                    <option value="@UserRole.Student.ToString()">Học sinh</option>
+                                }
+                                else if (Model.EditAccount.Role == (int)UserRole.Teacher)
+                                {
+                                    <option value="@UserRole.Admin.ToString()">Ban quản trị</option>
+                                    <option value="@UserRole.Teacher.ToString()" selected>Giáo viên</option>
+                                    <option value="@UserRole.Student.ToString()">Học sinh</option>
+                                }
+                                else
+                                {
+                                    <option value="@UserRole.Admin.ToString()">Ban quản trị</option>
+                                    <option value="@UserRole.Teacher.ToString()">Giáo viên</option>
+                                    <option value="@UserRole.Student.ToString()" selected>Học sinh</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="submit-button">Cập nhật tài khoản</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script>
+        window.onload = showPopup('editPopupOverlay');
+    </script>
+}

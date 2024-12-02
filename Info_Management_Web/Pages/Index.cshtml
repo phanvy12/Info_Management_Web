@@ -1,0 +1,45 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Login page";
+    Layout = "_Layout_Noheader";
+}
+<div class="login-card">
+    <div class="logo">
+        <img src="~/images/logo.png" alt="Logo">
+    </div>
+    <h1>Quản lý website khoa công nghệ thông tin</h1>
+    <form id="loginForm" method="post">
+        <label class="lb-title">Tài khoản</label>
+        <input type="text" id="username" name="username" placeholder="" required>
+        <label class="lb-title">Mật khẩu</label>
+        <input type="password" id="password" name="password" placeholder="" required>
+        <button type="button" onclick="showPopupSuccess('loginForm')">Đăng nhập</button>
+    </form>
+    <hr style="color: white;" />
+    <div class="forgot-password">
+        <a href="#">Quên mật khẩu</a>
+    </div>
+</div>
+@{
+    if (TempData["Error"] != null)
+    {
+        <div class="popup-overlay" id="errorPopup">
+            <div class="popup">
+                <div class="errormark"></div>
+                <p class="error-message">@TempData["Error"]!</p>
+            </div>
+        </div>
+        <script>
+            window.onload = function() {
+                showPopupError();
+            }
+        </script>
+    }
+}
+<div class="popup-overlay" id="successPopup">
+    <div class="popup">
+        <div class="checkmark"></div>
+        <p class="success-message">CHÚC MỪNG BẠN ĐĂNG NHẬP THÀNH CÔNG!</p>
+    </div>
+</div>
